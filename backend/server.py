@@ -380,8 +380,8 @@ async def download_document(document_id: str, current_user: dict = Depends(get_c
 @app.post("/api/documents/{document_id}/approve")
 async def approve_document_step(
     document_id: str,
-    step_index: int,
-    comments: str = "",
+    step_index: int = Form(...),
+    comments: str = Form(""),
     current_user: dict = Depends(get_current_user)
 ):
     document = await db.documents.find_one({"id": document_id})
