@@ -499,6 +499,11 @@ async def get_audit_logs(
     logs = await db.audit_logs.find(filter_query).sort("timestamp", -1).skip(skip).limit(limit).to_list(length=limit)
     total = await db.audit_logs.count_documents(filter_query)
     
+    # Convert ObjectId to string
+    for log in logs:
+        if '_id' in log:
+            log['_id'] = str(log['_id'])
+    
     return {
         "logs": logs,
         "total": total,
