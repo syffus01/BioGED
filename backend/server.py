@@ -356,6 +356,10 @@ async def get_document(document_id: str, current_user: dict = Depends(get_curren
     if not document:
         raise HTTPException(status_code=404, detail="Document not found")
     
+    # Convert ObjectId to string
+    if '_id' in document:
+        document['_id'] = str(document['_id'])
+    
     await log_audit(current_user["id"], current_user["full_name"], "DOCUMENT_VIEWED", "Document", document_id)
     return document
 
