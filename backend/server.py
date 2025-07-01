@@ -508,12 +508,22 @@ async def get_dashboard_data(current_user: dict = Depends(get_current_user)):
     # Recent documents
     recent_docs = await db.documents.find().sort("created_at", -1).limit(10).to_list(length=10)
     
+    # Convert ObjectId to string in recent_docs
+    for doc in recent_docs:
+        if '_id' in doc:
+            doc['_id'] = str(doc['_id'])
+    
     # Document types distribution
     pipeline = [
         {"$group": {"_id": "$document_type", "count": {"$sum": 1}}},
         {"$sort": {"count": -1}}
     ]
     doc_types = await db.documents.aggregate(pipeline).to_list(length=None)
+    
+    # Convert ObjectId to string in doc_types
+    for doc_type in doc_types:
+        if '_id' in doc_type:
+            doc_type['_id'] = str(doc_type['_id'])
     
     return {
         "stats": {
