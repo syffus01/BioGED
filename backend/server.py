@@ -30,6 +30,16 @@ class CustomJSONEncoder(json.JSONEncoder):
             return obj.isoformat()
         return super().default(obj)
 
+# Custom jsonable_encoder to handle MongoDB ObjectId
+def custom_jsonable_encoder(obj, **kwargs):
+    if isinstance(obj, ObjectId):
+        return str(obj)
+    if isinstance(obj, list):
+        return [custom_jsonable_encoder(item, **kwargs) for item in obj]
+    if isinstance(obj, dict):
+        return {k: custom_jsonable_encoder(v, **kwargs) for k, v in obj.items()}
+    return jsonable_encoder(obj, **kwargs)
+
 load_dotenv()
 
 # Custom response class to handle MongoDB ObjectId serialization
