@@ -565,6 +565,11 @@ async def search_documents(
     
     documents = await db.documents.find(filter_query).limit(20).to_list(length=20)
     
+    # Convert ObjectId to string
+    for doc in documents:
+        if '_id' in doc:
+            doc['_id'] = str(doc['_id'])
+    
     await log_audit(current_user["id"], current_user["full_name"], "SEARCH_PERFORMED", "Search", q, {"query": q, "type": document_type})
     
     return {"results": documents, "query": q}
