@@ -32,7 +32,19 @@ class CustomJSONEncoder(json.JSONEncoder):
 
 load_dotenv()
 
-app = FastAPI(title="PharmaVault EDMS", version="1.0.0")
+# Custom response class to handle MongoDB ObjectId serialization
+class MongoJSONResponse(JSONResponse):
+    def render(self, content):
+        return json.dumps(
+            content,
+            ensure_ascii=False,
+            allow_nan=False,
+            indent=None,
+            separators=(",", ":"),
+            cls=CustomJSONEncoder,
+        ).encode("utf-8")
+
+app = FastAPI(title="PharmaVault EDMS", version="1.0.0", default_response_class=MongoJSONResponse)
 
 # CORS middleware
 app.add_middleware(
