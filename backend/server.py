@@ -18,6 +18,17 @@ import base64
 from pathlib import Path
 import shutil
 import mimetypes
+from bson import ObjectId
+from fastapi.encoders import jsonable_encoder
+
+# Custom JSON encoder for MongoDB ObjectId
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        return super().default(obj)
 
 load_dotenv()
 
