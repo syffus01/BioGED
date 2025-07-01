@@ -338,6 +338,11 @@ async def get_documents(
     documents = await db.documents.find(filter_query).skip(skip).limit(limit).to_list(length=limit)
     total = await db.documents.count_documents(filter_query)
     
+    # Convert ObjectId to string
+    for doc in documents:
+        if '_id' in doc:
+            doc['_id'] = str(doc['_id'])
+    
     return {
         "documents": documents,
         "total": total,
