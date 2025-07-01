@@ -233,16 +233,32 @@ class PharmaVaultAPITester:
             "comments": "Approved during API testing"
         }
         
-        success, response = self.run_test(
-            "Approve Document Step",
-            "POST",
-            f"documents/{self.test_document_id}/approve",
-            200,
-            data=approval_data
-        )
+        # For form data, we need to use a different approach
+        url = f"{self.base_url}/api/documents/{self.test_document_id}/approve"
+        headers = {'Authorization': f'Bearer {self.token}'}
         
-        self.test_results["document_approval"] = success
-        return success
+        try:
+            response = requests.post(url, headers=headers, data=approval_data)
+            success = response.status_code == 200
+            
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                self.test_results["document_approval"] = True
+                return True
+            else:
+                print(f"❌ Failed - Expected 200, got {response.status_code}")
+                try:
+                    print(f"Response: {response.json()}")
+                except:
+                    print(f"Response: {response.text}")
+                self.test_results["document_approval"] = False
+                return False
+                
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            self.test_results["document_approval"] = False
+            return False
 
     def test_search_documents(self):
         """Test document search functionality"""
